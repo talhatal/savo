@@ -1,0 +1,98 @@
+name: amazon RDP
+
+on: workflow_dispatch
+
+jobs:
+
+build:
+
+runs-on: windows-latest
+
+timeout-minutes : 9999
+
+steps:
+
+name : Downloading Ngrok.
+
+run: 1
+
+Invoke - WebRequest
+
+https://raw.githubusercontent.com/romain09/
+
+AWS-RDP/main/ngrok-stable-windows-amd64.zip
+
+-Out File ngrok.zip
+
+Invoke - WebRequest
+
+https://raw.githubusercontent.com/romain09/
+
+AWS-RDP/main/start.bat - OutFile start.bat
+
+name: Extracting Ngrok Files.
+
+run: Expand-Archive ngrok.zip
+
+name: Connecting to your Ngrok
+
+account.
+
+run: .\ngrok\ngrok.exe authtoken
+
+$Env: NGROK_AUTH_TOKEN
+
+env:
+
+NGROK_AUTH_TOKEN: ${{
+
+secrets. NGROK_AUTH_TOKEN }}
+
+name: Activating RDP access.
+
+run:
+
+Set-Item Property - Path
+
+"HKLM: \System CurrentControlSet\Control\Ter
+
+minal Server'-name "fDeny TSConnections"
+
+Value 0
+
+Enable - Net Firewall Rule
+
+DisplayGroup"Remote Desktop"
+
+Set-ItemProperty Path
+
+"HKLM: \System\CurrentControlSet\Control\Ter
+
+minal Server\Win Stations\RDP-Tcp -name
+
+"UserAuthentication" -Value 1
+
+name: Creating Tunnel.
+
+run: Start-Process Powershell -
+
+ArgumentList'-Noexit -Command
+
+".\ngrok\ngrok.exe tcp 3389"!
+
+name: Connecting to your RDP.
+
+run: cmd /c start.bat
+
+name : RDP is ready!
+
+run:
+
+Invoke - WebRequest
+
+https://raw.githubusercontent.com/romain09/
+
+AWS-RDP/main/loop.psl-Out File loop.psl
+
+./loop.ps1
+
